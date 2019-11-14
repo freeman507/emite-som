@@ -6,12 +6,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
-import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.*;
 import javax.swing.*;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 
 @SpringBootApplication
 @RestController
@@ -25,31 +24,29 @@ public class EmiteSomApplication {
 	@GetMapping
 	public String emiteSom() {
 		System.out.println("tocou");
-		tocaSom();
-		return "OK";
+        try {
+            tocaSom();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "OK";
 	}
 
-	private void tocaSom() {
-		// Carrega o arquivo de áudio (não funciona com .mp3, só .wav)
-		String resource = "./cavalo.mp3";
-		InputStream input = getClass().getResourceAsStream(resource);
-		Clip oClip = null;
-		try {
-			oClip = AudioSystem.getClip();
-		AudioInputStream audioInput = AudioSystem.getAudioInputStream(input);
-		oClip.open(audioInput);
+    public void tocaSom() throws Exception {
+        // Carrega o arquivo de áudio (não funciona com .mp3, só .wav)
+        URL oUrl = new URL("https://www.dropbox.com/s/xf7jhrzovq8wt09/beep-02.wav?dl=1");
+        Clip oClip = AudioSystem.getClip();
+        AudioInputStream oStream = AudioSystem.getAudioInputStream(oUrl);
+        oClip.open(oStream);
 
-		oClip.loop(0); // Toca uma vez
-		//clip.loop(Clip.LOOP_CONTINUOUSLY); // Toca continuamente (para o caso de músicas)
+        oClip.loop(0); // Toca uma vez
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		// Para a execução (senão o programa termina antes de você ouvir o som)
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
 
-			}
-		});
-	}
+        // Para a execução (senão o programa termina antes de ouvir o som)
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+
+            }
+        });
+    }
  }
